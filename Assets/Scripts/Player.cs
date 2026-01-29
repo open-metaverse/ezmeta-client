@@ -1,4 +1,6 @@
+using System;
 using Fusion;
+using TMPro;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
@@ -16,6 +18,34 @@ public class Player : NetworkBehaviour
     private NetworkCharacterController _cc;
     private Vector3 _forward;
 
+    private TMP_Text _messages;
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SendMessage(string message, RpcInfo info = default)
+    {
+        RPC_RelayMessage(message, info.Source);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RelayMessage(string message, PlayerRef messageSource)
+    {
+        if (_messages == null)
+            _messages = FindObjectOfType<TMP_Text>();
+
+        DateTime currentTime = DateTime.Now;
+        string timeStamp = $"[{currentTime.Hour}:{currentTime.Minute}:{currentTime.Second}] ";
+        
+        if (messageSource == Runner.LocalPlayer)
+        {
+            message = $"{timeStamp}: You said {message}\n";
+        }
+        else
+        {
+            message = $"{timeStamp}: Some other player said: {message}\n";
+        }
+
+        _messages.text = message;
+    }
     public override void Spawned()
     {
         _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
@@ -26,6 +56,14 @@ public class Player : NetworkBehaviour
         _cc = GetComponent<NetworkCharacterController>();
         _forward = transform.forward;
         _material = GetComponentInChildren<MeshRenderer>().material;
+    }
+
+    private void Update()
+    {
+    if (Object.HasInputAuthority && Input.GetKeyDown(KeyCode.R))
+    {
+        RPC_SendMessage("Hey Mate!");
+    }
     }
 
     public override void Render()
