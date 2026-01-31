@@ -10,14 +10,6 @@
       ]
     },
     {
-      "name": "restage",
-      "command": "git",
-      "args": [
-        "add",
-        "-A"
-      ]
-    },
-    {
       "name": "lint",
       "command": "dotnet",
       "args": [
@@ -32,7 +24,6 @@
       "name": "pre-commit",
       "tasks": [
         "format",
-        "restage",
         "lint"
       ]
     }
