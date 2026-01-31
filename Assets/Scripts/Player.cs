@@ -19,7 +19,7 @@ public class Player : NetworkBehaviour
     private NetworkCharacterController _cc;
     private Vector3 _forward;
 
-    private TMP_Text _messages;
+    private ChatPanel _chatPanel;
 
     [Rpc(
         RpcSources.InputAuthority,
@@ -34,22 +34,13 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RelayMessage(string message, PlayerRef messageSource)
     {
-        if (_messages == null)
-            _messages = FindFirstObjectByType<TMP_Text>();
+        if (_chatPanel == null)
+            _chatPanel = FindFirstObjectByType<ChatPanel>();
 
-        DateTime currentTime = DateTime.Now;
-        string timeStamp = $"[{currentTime.Hour}:{currentTime.Minute}:{currentTime.Second}] ";
-
-        if (messageSource == Runner.LocalPlayer)
+        if (_chatPanel != null)
         {
-            message = $"{timeStamp}: You said {message}\n";
+            _chatPanel.AddMessage(message, messageSource, Runner.LocalPlayer);
         }
-        else
-        {
-            message = $"{timeStamp}: Some other player said: {message}\n";
-        }
-
-        _messages.text = message;
     }
 
     public override void Spawned()
