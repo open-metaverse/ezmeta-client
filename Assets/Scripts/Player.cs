@@ -35,7 +35,7 @@ public class Player : NetworkBehaviour
     public void RPC_RelayMessage(string message, PlayerRef messageSource)
     {
         if (_messages == null)
-            _messages = FindObjectOfType<TMP_Text>();
+            _messages = FindFirstObjectByType<TMP_Text>();
 
         DateTime currentTime = DateTime.Now;
         string timeStamp = $"[{currentTime.Hour}:{currentTime.Minute}:{currentTime.Second}] ";
@@ -59,7 +59,7 @@ public class Player : NetworkBehaviour
         // LocalPlayerの場合のみカメラをセットアップ
         if (Object.HasInputAuthority)
         {
-            CameraFollower cameraFollower = FindObjectOfType<CameraFollower>();
+            CameraFollower cameraFollower = FindFirstObjectByType<CameraFollower>();
             if (cameraFollower != null)
             {
                 cameraFollower.SetTarget(transform);
@@ -101,6 +101,15 @@ public class Player : NetworkBehaviour
         if (GetInput(out NetworkInputData data))
         {
             data.direction.Normalize();
+
+            // カメラ向きに基づいて移動方向を修正
+            CameraFollower camera = FindFirstObjectByType<CameraFollower>();
+            if (camera != null && Object.HasInputAuthority)
+            {
+                Quaternion cameraRot = camera.GetCameraRotation();
+                data.direction = cameraRot * data.direction;
+            }
+
             _cc.Move(5 * data.direction * Runner.DeltaTime);
 
             if (data.direction.sqrMagnitude > 0)
