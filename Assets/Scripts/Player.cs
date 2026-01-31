@@ -10,6 +10,7 @@ public class Player : NetworkBehaviour
 
     [Networked]
     private TickTimer delay { get; set; }
+
     [Networked]
     public bool spawnedProjectile { get; set; }
 
@@ -20,7 +21,11 @@ public class Player : NetworkBehaviour
 
     private TMP_Text _messages;
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    [Rpc(
+        RpcSources.InputAuthority,
+        RpcTargets.StateAuthority,
+        HostMode = RpcHostMode.SourceIsHostPlayer
+    )]
     public void RPC_SendMessage(string message, RpcInfo info = default)
     {
         RPC_RelayMessage(message, info.Source);
@@ -34,7 +39,7 @@ public class Player : NetworkBehaviour
 
         DateTime currentTime = DateTime.Now;
         string timeStamp = $"[{currentTime.Hour}:{currentTime.Minute}:{currentTime.Second}] ";
-        
+
         if (messageSource == Runner.LocalPlayer)
         {
             message = $"{timeStamp}: You said {message}\n";
@@ -46,6 +51,7 @@ public class Player : NetworkBehaviour
 
         _messages.text = message;
     }
+
     public override void Spawned()
     {
         _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
@@ -60,10 +66,10 @@ public class Player : NetworkBehaviour
 
     private void Update()
     {
-    if (Object.HasInputAuthority && Input.GetKeyDown(KeyCode.R))
-    {
-        RPC_SendMessage("Hey Mate!");
-    }
+        if (Object.HasInputAuthority && Input.GetKeyDown(KeyCode.R))
+        {
+            RPC_SendMessage("Hey Mate!");
+        }
     }
 
     public override void Render()
@@ -77,8 +83,9 @@ public class Player : NetworkBehaviour
                     break;
             }
         }
-    _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
+        _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
     }
+
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData data))

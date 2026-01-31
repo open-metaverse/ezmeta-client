@@ -6,8 +6,7 @@
       "args": [
         "csharpier",
         "format",
-        "Assets",
-        "Packages"
+        "Assets/Scripts"
       ]
     },
     {
