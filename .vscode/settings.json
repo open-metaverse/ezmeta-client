@@ -56,6 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "photon_tutorial.sln",
+    "dotnet.defaultSolution": "ezmeta-client.slnx",
     "dotnet.preferCSharpExtension": true
 }
