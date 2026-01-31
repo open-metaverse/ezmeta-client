@@ -55,6 +55,16 @@ public class Player : NetworkBehaviour
     public override void Spawned()
     {
         _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+
+        // LocalPlayerの場合のみカメラをセットアップ
+        if (Object.HasInputAuthority)
+        {
+            CameraFollower cameraFollower = FindObjectOfType<CameraFollower>();
+            if (cameraFollower != null)
+            {
+                cameraFollower.SetTarget(transform);
+            }
+        }
     }
 
     private void Awake()
