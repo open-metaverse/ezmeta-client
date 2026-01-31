@@ -10,12 +10,16 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    public static LobbyManager Instance { get; private set; }
+
     [SerializeField]
     private NetworkPrefabRef _playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters =
         new Dictionary<PlayerRef, NetworkObject>();
 
     private NetworkRunner _runner;
+    private bool _callbacksAdded;
+    private bool _isStarting;
 
     /// <summary>
     /// プレイヤー参加時の処理（Fusionコールバック）
@@ -156,6 +160,13 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
         Debug.Log("[LobbyManager] Awake called");
         // 必ずルートにないと、親がdestroyされたときに一緒に消える
         DontDestroyOnLoad(gameObject);
@@ -163,6 +174,10 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void OnDestroy()
     {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
         Debug.Log("[LobbyManager] OnDestroy called");
     }
 
@@ -186,39 +201,96 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     async void StartGame(GameMode mode)
     {
-        Debug.Log($"[LobbyManager] StartGame called with mode: {mode}");
-
-        // Create the Fusion runner and let it know that we will be providing user input
-        _runner = gameObject.AddComponent<NetworkRunner>();
-        _runner.ProvideInput = true;
-
-        // GameSceneのSceneRefを取得
-        var gameScene = SceneRef.FromIndex(
-            SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/GameScene.unity")
-        );
-        Debug.Log($"[LobbyManager] GameScene build index: {gameScene}");
-
-        // Create the NetworkSceneInfo
-        var sceneInfo = new NetworkSceneInfo();
-        if (gameScene.IsValid)
+        if (_isStarting)
         {
-            sceneInfo.AddSceneRef(gameScene, LoadSceneMode.Additive);
+            Debug.LogWarning("[LobbyManager] StartGame is already running.");
+            return;
         }
 
-        // Start or join (depends on gamemode) a session with a specific name
-        Debug.Log("[LobbyManager] Starting Fusion...");
-        await _runner.StartGame(
-            new StartGameArgs()
+        if (_runner != null && _runner.IsRunning)
+        {
+            Debug.LogWarning("[LobbyManager] Runner is already running.");
+            return;
+        }
+
+        _isStarting = true;
+        Debug.Log($"[LobbyManager] StartGame called with mode: {mode}");
+
+        try
+        {
+            NetworkRunner runner = EnsureRunner();
+            NetworkSceneManagerDefault sceneManager = EnsureSceneManager();
+
+            // GameSceneのSceneRefを取得
+            int buildIndex = SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/GameScene.unity");
+            if (buildIndex < 0)
             {
-                GameMode = mode,
-                SessionName = sessionName,
-                Scene = gameScene,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                Debug.LogError(
+                    "[LobbyManager] GameScene not found in Build Settings. Check the path and build list."
+                );
+                return;
             }
-        );
-        Debug.Log("[LobbyManager] Fusion started!");
+
+            var gameScene = SceneRef.FromIndex(buildIndex);
+            if (!gameScene.IsValid)
+            {
+                Debug.LogError("[LobbyManager] GameScene SceneRef is invalid.");
+                return;
+            }
+
+            Debug.Log($"[LobbyManager] GameScene build index: {gameScene}");
+
+            // Start or join (depends on gamemode) a session with a specific name
+            Debug.Log("[LobbyManager] Starting Fusion...");
+            await runner.StartGame(
+                new StartGameArgs()
+                {
+                    GameMode = mode,
+                    SessionName = sessionName,
+                    Scene = gameScene,
+                    SceneManager = sceneManager,
+                }
+            );
+            Debug.Log("[LobbyManager] Fusion started!");
+        }
+        finally
+        {
+            _isStarting = false;
+        }
     }
 
     [SerializeField]
     private string sessionName = "TestRoom";
+
+    private NetworkRunner EnsureRunner()
+    {
+        if (_runner == null)
+        {
+            _runner = GetComponent<NetworkRunner>();
+            if (_runner == null)
+            {
+                _runner = gameObject.AddComponent<NetworkRunner>();
+            }
+        }
+
+        if (!_callbacksAdded)
+        {
+            _runner.AddCallbacks(this);
+            _callbacksAdded = true;
+        }
+
+        _runner.ProvideInput = true;
+        return _runner;
+    }
+
+    private NetworkSceneManagerDefault EnsureSceneManager()
+    {
+        NetworkSceneManagerDefault sceneManager = GetComponent<NetworkSceneManagerDefault>();
+        if (sceneManager == null)
+        {
+            sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
+        }
+
+        return sceneManager;
+    }
 }

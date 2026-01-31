@@ -124,12 +124,15 @@ public class ChatPanel : MonoBehaviour
 
         string message = inputField.text.Trim();
 
-        // PlayerからRPCを呼び出し
-        Player localPlayer = FindFirstObjectByType<Player>();
-        if (localPlayer != null)
+        // ローカルプレイヤーからRPCを呼び出し
+        Player localPlayer = Player.LocalInstance;
+        if (localPlayer == null)
         {
-            localPlayer.RPC_SendMessage(message);
+            Debug.LogWarning("[ChatPanel] Local player not ready. Message not sent.");
+            return;
         }
+
+        localPlayer.RPC_SendMessage(message);
 
         // 入力フィールドをクリア
         inputField.text = "";

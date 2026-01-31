@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    public static Player LocalInstance { get; private set; }
+
     [SerializeField]
     private Ball _prefabBall;
 
@@ -50,11 +52,20 @@ public class Player : NetworkBehaviour
         // LocalPlayerの場合のみカメラをセットアップ
         if (Object.HasInputAuthority)
         {
+            LocalInstance = this;
             CameraFollower cameraFollower = FindFirstObjectByType<CameraFollower>();
             if (cameraFollower != null)
             {
                 cameraFollower.SetTarget(transform);
             }
+        }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (Object.HasInputAuthority && LocalInstance == this)
+        {
+            LocalInstance = null;
         }
     }
 
