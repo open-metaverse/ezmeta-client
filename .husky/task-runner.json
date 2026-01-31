@@ -6,7 +6,8 @@
       "args": [
         "csharpier",
         "format",
-        "Assets"
+        "Assets",
+        "Packages"
       ]
     },
     {
@@ -23,6 +24,16 @@
       "args": [
         "build",
         "-warnaserror"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "name": "pre-commit",
+      "tasks": [
+        "format",
+        "restage",
+        "lint"
       ]
     }
   ]
