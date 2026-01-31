@@ -75,9 +75,12 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
 
-    public void OnConnectedToServer(NetworkRunner runner) { }
+    void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner) { }
 
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
+    void INetworkRunnerCallbacks.OnDisconnectedFromServer(
+        NetworkRunner runner,
+        NetDisconnectReason reason
+    ) { }
 
     public void OnConnectRequest(
         NetworkRunner runner,

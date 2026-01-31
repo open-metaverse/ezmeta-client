@@ -1,0 +1,21 @@
+<Project>
+  <!-- Lint-only project: compile just Assets/Scripts but keep Unity/Fusion/TMP references from Assembly-CSharp.csproj -->
+  <Import Project="Assembly-CSharp.csproj" />
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+    <Compile Include="Assets\Scripts\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Remove="Fusion.Unity.csproj" />
+    <ProjectReference Remove="Fusion.Unity.Editor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Fusion.Unity" Condition="Exists('Library\\ScriptAssemblies\\Fusion.Unity.dll')">
+      <HintPath>Library\ScriptAssemblies\Fusion.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
