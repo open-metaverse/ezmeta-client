@@ -145,7 +145,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
             new StartGameArgs()
             {
                 GameMode = mode,
-                SessionName = "TestRoom",
+                SessionName = sessionName,
                 Scene = scene,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             }
