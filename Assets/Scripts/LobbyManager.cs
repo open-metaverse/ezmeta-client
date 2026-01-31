@@ -19,6 +19,12 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField]
     private Image _loadingImage;
 
+    [SerializeField]
+    private AudioSource _audioSource;
+
+    [SerializeField]
+    private AudioClip _loadingSound;
+
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters =
         new Dictionary<PlayerRef, NetworkObject>();
 
@@ -144,7 +150,18 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
 
-    public void OnSceneLoadDone(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner)
+    {
+        // ゲームシーンへのロード完了時にローディングUIと音楽を停止
+        if (_loadingImage != null)
+        {
+            _loadingImage.gameObject.SetActive(false);
+        }
+        if (_audioSource != null && _audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+        }
+    }
 
     public void OnSceneLoadStart(NetworkRunner runner) { }
 
@@ -225,6 +242,10 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
         _isStarting = true;
         _loadingImage.gameObject.SetActive(true);
+        if (_audioSource != null && _loadingSound != null)
+        {
+            _audioSource.PlayOneShot(_loadingSound);
+        }
         Debug.Log($"[LobbyManager] StartGame called with mode: {mode}");
 
         try
