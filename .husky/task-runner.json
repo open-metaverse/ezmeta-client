@@ -1,0 +1,29 @@
+{
+  "tasks": [
+    {
+      "name": "format",
+      "command": "dotnet",
+      "args": [
+        "csharpier",
+        "format",
+        "Assets"
+      ]
+    },
+    {
+      "name": "restage",
+      "command": "git",
+      "args": [
+        "add",
+        "-A"
+      ]
+    },
+    {
+      "name": "lint",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "-warnaserror"
+      ]
+    }
+  ]
+}
