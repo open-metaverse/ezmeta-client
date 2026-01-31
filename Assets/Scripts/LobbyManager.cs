@@ -3,6 +3,7 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// ロビー管理マネージャー
@@ -14,12 +15,21 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField]
     private NetworkPrefabRef _playerPrefab;
+
+    [SerializeField]
+    private Image _loadingImage;
+
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters =
         new Dictionary<PlayerRef, NetworkObject>();
 
     private NetworkRunner _runner;
     private bool _callbacksAdded;
     private bool _isStarting;
+
+    public void Start()
+    {
+        _loadingImage.gameObject.SetActive(false);
+    }
 
     /// <summary>
     /// プレイヤー参加時の処理（Fusionコールバック）
@@ -214,6 +224,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         _isStarting = true;
+        _loadingImage.gameObject.SetActive(true);
         Debug.Log($"[LobbyManager] StartGame called with mode: {mode}");
 
         try
