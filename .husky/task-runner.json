@@ -23,6 +23,7 @@
       "command": "dotnet",
       "args": [
         "build",
+        "ezmeta-client.sln",
         "-warnaserror"
       ]
     }
