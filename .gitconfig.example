@@ -1,0 +1,7 @@
+[merge "unityyamlmerge"]
+  name = "Unity SmartMerge (UnityYAMLMerge)"
+  driver = "\"C:/Program Files/Unity/Hub/Editor/6000.3.6f1/Editor/Data/Tools/UnityYAMLMerge.exe\" merge -p %O %B %A %A"
+
+[mergetool "unityyamlmerge"]
+  cmd = "\"C:/Program Files/Unity/Hub/Editor/6000.3.6f1/Editor/Data/Tools/UnityYAMLMerge.exe\" merge -p \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
+  trustExitCode = true
