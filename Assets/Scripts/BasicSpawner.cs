@@ -53,18 +53,30 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         var data = new NetworkInputData();
 
+        var direction = Vector3.zero;
         if (Input.GetKey(KeyCode.W))
-            data.direction += Vector3.forward;
+            direction += Vector3.forward;
 
         if (Input.GetKey(KeyCode.S))
-            data.direction += Vector3.back;
+            direction += Vector3.back;
 
         if (Input.GetKey(KeyCode.A))
-            data.direction += Vector3.left;
+            direction += Vector3.left;
 
         if (Input.GetKey(KeyCode.D))
-            data.direction += Vector3.right;
+            direction += Vector3.right;
 
+        if (direction.sqrMagnitude > 0)
+        {
+            direction.Normalize();
+            CameraFollower camera = FindFirstObjectByType<CameraFollower>();
+            if (camera != null)
+            {
+                direction = camera.GetCameraRotation() * direction;
+            }
+        }
+
+        data.direction = direction;
         data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
         _mouseButton0 = false;
 

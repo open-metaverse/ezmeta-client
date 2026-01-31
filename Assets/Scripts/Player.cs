@@ -96,19 +96,26 @@ public class Player : NetworkBehaviour
         _material.color = Color.Lerp(_material.color, Color.blue, Time.deltaTime);
     }
 
+    /*
+    Player.FixedUpdateNetwork() は **Unity の FixedUpdate() ではなく、Fusion の「シミュレーショ
+      ン・ティックごと」**に呼ばれるメソッドです。
+      ざっくり言うと：
+                                                                                                  
+      - タイミング: ネットワークの ティック（TickRate）ごと
+      - 呼ばれる側:
+          - 入力権限のあるクライアント（予測）
+          - サーバー/ホスト（権威計算）
+      - 順序感: OnInput で集めた入力 → FixedUpdateNetwork でシミュレーション
+                                                                                                  
+      なのでフレームに1回とは限らず、1フレームで複数回/0回になることもあります（追いつき/間引
+      き）。
+      このため 入力の向き変換は OnInput 側でやるのが安定します。
+    */
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData data))
         {
             data.direction.Normalize();
-
-            // カメラ向きに基づいて移動方向を修正
-            CameraFollower camera = FindFirstObjectByType<CameraFollower>();
-            if (camera != null && Object.HasInputAuthority)
-            {
-                Quaternion cameraRot = camera.GetCameraRotation();
-                data.direction = cameraRot * data.direction;
-            }
 
             _cc.Move(5 * data.direction * Runner.DeltaTime);
 
