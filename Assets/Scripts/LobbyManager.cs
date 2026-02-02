@@ -20,6 +20,9 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     private Image _loadingImage;
 
     [SerializeField]
+    private Sprite[] _loadingSprites;
+
+    [SerializeField]
     private AudioSource _audioSource;
 
     [SerializeField]
@@ -35,6 +38,12 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     public void Start()
     {
         _loadingImage.gameObject.SetActive(false);
+        // ランダムで、画像配列の中からjpgを選ぶ
+        if (_loadingSprites != null && _loadingSprites.Length > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, _loadingSprites.Length);
+            _loadingImage.sprite = _loadingSprites[randomIndex];
+        }
     }
 
     /// <summary>

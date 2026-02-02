@@ -304,6 +304,9 @@ MonoBehaviour:
   _playerPrefab:
     RawGuidValue: 90c0833f74e08b348b3d60129a7fd1d0
   _loadingImage: {fileID: 2019902254}
+  _loadingSprites:
+  - {fileID: 21300000, guid: 30399deb88845834b95c0a645afa6bae, type: 3}
+  - {fileID: 21300000, guid: 2f970ea471e2a24469d233d05d80c97c, type: 3}
   _audioSource: {fileID: 344116980}
   _loadingSound: {fileID: 8300000, guid: 9a2b5540d010a7345a9f1040f8e038f5, type: 3}
   sessionName: TestRoom
@@ -769,8 +772,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6804b80191a11a24285b9dc909ff81f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputManager
-  _mouseButton0: 0
-  _runner: {fileID: 0}
 --- !u!4 &1835804017
 Transform:
   m_ObjectHideFlags: 0
