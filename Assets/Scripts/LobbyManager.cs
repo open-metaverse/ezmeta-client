@@ -20,7 +20,10 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     private Image _loadingImage;
 
     [SerializeField]
-    private Sprite[] _loadingSprites;
+    private Image _loadingAdImage;
+
+    [SerializeField]
+    private Sprite[] _loadingAdSprites;
 
     [SerializeField]
     private AudioSource _audioSource;
@@ -40,13 +43,17 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void Start()
     {
-        _loadingImage.gameObject.SetActive(false);
-        // ランダムで、画像配列の中からjpgを選ぶ
-        if (_loadingSprites != null && _loadingSprites.Length > 0)
+        if (_loadingImage != null)
         {
-            int randomIndex = UnityEngine.Random.Range(0, _loadingSprites.Length);
-            _loadingImage.sprite = _loadingSprites[randomIndex];
+            _loadingImage.gameObject.SetActive(false);
         }
+        if (_loadingAdImage != null)
+        {
+            _loadingAdImage.gameObject.SetActive(false);
+            _loadingAdImage.preserveAspect = true;
+        }
+
+        SetRandomAdSprite();
     }
 
     /// <summary>
@@ -139,6 +146,10 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             _loadingImage.gameObject.SetActive(false);
         }
+        if (_loadingAdImage != null)
+        {
+            _loadingAdImage.gameObject.SetActive(false);
+        }
         if (_audioSource != null && _audioSource.isPlaying)
         {
             _audioSource.Stop();
@@ -223,7 +234,15 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         _isStarting = true;
-        _loadingImage.gameObject.SetActive(true);
+        SetRandomAdSprite();
+        if (_loadingImage != null)
+        {
+            _loadingImage.gameObject.SetActive(true);
+        }
+        if (_loadingAdImage != null)
+        {
+            _loadingAdImage.gameObject.SetActive(true);
+        }
         if (_audioSource != null && _loadingSound != null)
         {
             _audioSource.PlayOneShot(_loadingSound);
@@ -306,5 +325,20 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         return sceneManager;
+    }
+
+    private void SetRandomAdSprite()
+    {
+        if (_loadingAdImage == null)
+        {
+            return;
+        }
+        if (_loadingAdSprites == null || _loadingAdSprites.Length == 0)
+        {
+            return;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, _loadingAdSprites.Length);
+        _loadingAdImage.sprite = _loadingAdSprites[randomIndex];
     }
 }
