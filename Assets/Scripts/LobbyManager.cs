@@ -35,6 +35,9 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
     private bool _callbacksAdded;
     private bool _isStarting;
 
+    [SerializeField]
+    private InputManager _inputManager;
+
     public void Start()
     {
         _loadingImage.gameObject.SetActive(false);
@@ -82,45 +85,15 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    private bool _mouseButton0;
-
-    private void Update()
-    {
-        _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
-    }
-
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var data = new NetworkInputData();
-
-        var direction = Vector3.zero;
-        if (Input.GetKey(KeyCode.W))
-            direction += Vector3.forward;
-
-        if (Input.GetKey(KeyCode.S))
-            direction += Vector3.back;
-
-        if (Input.GetKey(KeyCode.A))
-            direction += Vector3.left;
-
-        if (Input.GetKey(KeyCode.D))
-            direction += Vector3.right;
-
-        if (direction.sqrMagnitude > 0)
+        if (_inputManager == null)
         {
-            direction.Normalize();
-            CameraFollower camera = FindFirstObjectByType<CameraFollower>();
-            if (camera != null)
-            {
-                direction = camera.GetCameraRotation() * direction;
-            }
+            Debug.LogError("[LobbyManager] InputManager is not assigned.");
+            return;
         }
 
-        data.direction = direction;
-        data.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
-        _mouseButton0 = false;
-
-        input.Set(data);
+        _inputManager.FillInput(runner, input);
     }
 
     #region INetworkRunnerCallbacks - 必須の空実装

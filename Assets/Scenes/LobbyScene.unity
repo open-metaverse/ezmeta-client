@@ -309,6 +309,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2f970ea471e2a24469d233d05d80c97c, type: 3}
   _audioSource: {fileID: 344116980}
   _loadingSound: {fileID: 8300000, guid: 9a2b5540d010a7345a9f1040f8e038f5, type: 3}
+  _inputManager: {fileID: 1835804018}
   sessionName: TestRoom
 --- !u!82 &344116980
 AudioSource:
@@ -752,7 +753,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1835804017}
-  - component: {fileID: 1835804016}
+  - component: {fileID: 1835804018}
   m_Layer: 0
   m_Name: InputManager
   m_TagString: Untagged
@@ -760,18 +761,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1835804016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1835804015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6804b80191a11a24285b9dc909ff81f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InputManager
 --- !u!4 &1835804017
 Transform:
   m_ObjectHideFlags: 0
@@ -787,6 +776,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1835804018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835804015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0957cde0d7aeabd4c94782e70493fda7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InputManager
 --- !u!1 &1882995411
 GameObject:
   m_ObjectHideFlags: 0
