@@ -40,6 +40,15 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField]
     private InputManager _inputManager;
+    private int _sceneLoadTaskId = -1;
+    private bool _sceneLoadInProgress;
+    private float _sceneLoadProgress;
+
+    [SerializeField]
+    private float _sceneLoadMaxProgress = 0.95f;
+
+    [SerializeField]
+    private float _sceneLoadProgressSpeed = 0.35f;
 
     public void Start()
     {
@@ -103,6 +112,19 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         _inputManager.FillInput(runner, input);
     }
 
+    private void Update()
+    {
+        if (_sceneLoadInProgress && _sceneLoadTaskId >= 0)
+        {
+            _sceneLoadProgress = Mathf.MoveTowards(
+                _sceneLoadProgress,
+                _sceneLoadMaxProgress,
+                _sceneLoadProgressSpeed * Time.unscaledDeltaTime
+            );
+            LoadingProgress.Report(_sceneLoadTaskId, _sceneLoadProgress);
+        }
+    }
+
     #region INetworkRunnerCallbacks - 必須の空実装
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
@@ -154,9 +176,26 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             _audioSource.Stop();
         }
+
+        if (_sceneLoadTaskId >= 0)
+        {
+            LoadingProgress.Report(_sceneLoadTaskId, 1f);
+            LoadingProgress.Complete(_sceneLoadTaskId);
+        }
+        _sceneLoadTaskId = -1;
+        _sceneLoadInProgress = false;
     }
 
-    public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner)
+    {
+        _sceneLoadInProgress = true;
+        _sceneLoadProgress = 0f;
+        if (_sceneLoadTaskId < 0)
+        {
+            _sceneLoadTaskId = LoadingProgress.BeginTask(1f);
+        }
+        LoadingProgress.Report(_sceneLoadTaskId, 0f);
+    }
 
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
 
@@ -234,6 +273,10 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         _isStarting = true;
+        _sceneLoadTaskId = -1;
+        _sceneLoadInProgress = false;
+        _sceneLoadProgress = 0f;
+        LoadingProgress.BeginSession();
         SetRandomAdSprite();
         if (_loadingImage != null)
         {
@@ -249,6 +292,7 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         Debug.Log($"[LobbyManager] StartGame called with mode: {mode}");
 
+        bool startGameSucceeded = false;
         try
         {
             NetworkRunner runner = EnsureRunner();
@@ -285,9 +329,26 @@ public class LobbyManager : MonoBehaviour, INetworkRunnerCallbacks
                 }
             );
             Debug.Log("[LobbyManager] Fusion started!");
+            startGameSucceeded = true;
         }
         finally
         {
+            if (!startGameSucceeded)
+            {
+                LoadingProgress.EndSession();
+                _sceneLoadTaskId = -1;
+                _sceneLoadInProgress = false;
+
+                if (_loadingImage != null)
+                {
+                    _loadingImage.gameObject.SetActive(false);
+                }
+                if (_loadingAdImage != null)
+                {
+                    _loadingAdImage.gameObject.SetActive(false);
+                }
+            }
+
             _isStarting = false;
         }
     }
